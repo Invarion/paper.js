@@ -1650,6 +1650,7 @@ new function() { // Injection scope for various item event handlers
             if (name !== orig)
                 copy.setName(name);
         }
+        copy.rapid = this.rapid.clone();
         return copy;
     },
 
