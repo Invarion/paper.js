@@ -29,7 +29,8 @@ var ToolEvent = Event.extend(/** @lends ToolEvent# */{
     initialize: function ToolEvent(tool, type, event) {
         this.tool = tool;
         this.type = type;
-        this.event = event;
+        this.event = 'srcEvent' in event ? event.srcEvent : event;
+        this.gesture = event;
     },
 
     /**
