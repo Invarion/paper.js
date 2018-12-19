@@ -278,6 +278,22 @@ var Tool = PaperScopeItem.extend(/** @lends Tool# */{
      * }
      */
 
+    _handleTouchGestureEvent: function(type, event, point) {
+
+        paper = this._scope;
+
+        var responds = this.responds(type),
+            called = false,
+            tool = this;
+
+        if (responds) {
+
+            called = tool.emit(type, new ToolEvent(tool, type, event)) || called;
+        }
+
+        return called;
+    },
+
     /**
      * Private method to handle tool-events.
      *
