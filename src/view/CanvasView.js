@@ -112,13 +112,16 @@ var CanvasView = View.extend(/** @lends CanvasView# */{
     getTextWidth: function(font, lines) {
         var ctx = this._context,
             prevFont = ctx.font,
+            prevBaseline = ctx.textBaseline,
             width = 0;
         ctx.font = font;
+        ctx.textBaseline = 'top';
         // Measure the real width of the text. Unfortunately, there is no sane
         // way to measure text height with canvas.
         for (var i = 0, l = lines.length; i < l; i++)
             width = Math.max(width, ctx.measureText(lines[i]).width);
         ctx.font = prevFont;
+        ctx.textBaseline = prevBaseline;
         return width;
     },
 
