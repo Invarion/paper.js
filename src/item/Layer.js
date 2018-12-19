@@ -94,4 +94,72 @@ var Layer = Group.extend(/** @lends Layer# */{
 
     _hitTestSelf: function() {
     }
+    ,_draw: function(ctx, param) {
+        var clipItem = this._getClipItem();
+        if (clipItem) {
+            param.clipping = true;
+            clipItem.draw(ctx, param);
+            delete param.clipping;
+        }
+
+        var roads = [];
+        var drawRoads = false;
+        for (var i = 0, l = this._children.length; i < l; i++) {
+            var item = this._children[i];
+            if (item != clipItem)
+            {
+                if (item.rapid.type == 'Road' && item.rapid.autoMerge)
+                {
+                    drawRoads = true;
+                    roads.push(item);
+                }
+                else
+                {
+                    if (drawRoads)
+                    {
+                        this._drawSteppedRoads(roads, ctx, param);
+                        roads = [];
+                        drawRoads = false;
+                    }
+
+                    item.draw(ctx, param);
+                }
+            }
+        }
+
+        if (drawRoads)
+        {
+            this._drawSteppedRoads(roads, ctx, param);
+        }
+    }
+
+    ,_drawSteppedRoads: function(roads, ctx, param)
+    {
+        if (roads.length === 1)
+        {
+            roads[0].draw(ctx, param);
+            return;
+        }
+
+        for (var step = 0; step < 10; step++)
+        {
+            param.step = step;
+            for (var r = 0, rl = roads.length; r < rl; r++)
+            {
+                roads[r].draw(ctx, param);
+            }
+        }
+
+        for (var r = 0, rl = roads.length; r < rl; r++)
+        {
+            for (var step = 10, rc = roads[r].children.length; step < rc; step++)
+            {
+                param.step = step;
+                roads[r].draw(ctx, param);
+            }
+        }
+
+        if (param.step)
+            delete param.step;
+    }
 });

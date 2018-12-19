@@ -198,10 +198,17 @@ var Group = Item.extend(/** @lends Group# */{
             clipItem.draw(ctx, param.extend({ clip: true }));
         }
         var children = this._children;
-        for (var i = 0, l = children.length; i < l; i++) {
-            var item = children[i];
-            if (item !== clipItem)
+        if (param.step)
+        {
+            var item = children[param.step];
+            if (item != clipItem)
                 item.draw(ctx, param);
         }
+        else
+            for (var i = 0, l = children.length; i < l; i++) {
+                var item = children[i];
+                if (item !== clipItem)
+                    item.draw(ctx, param);
+            }
     }
 });
