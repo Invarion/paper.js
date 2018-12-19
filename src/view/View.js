@@ -58,6 +58,32 @@ var View = Base.extend(Emitter, /** @lends View# */{
                 tapHighlightColor: 'rgba(0,0,0,0)'
             });
 
+            var hammerEventsSub = ['pan', 'panstart', 'panend', 'panmove', 'pinch', 'pinchstart', 'pinchend', 'press', 'doubletap'];
+            var hammer = new Hammer(element);
+            hammer.get('pinch').set({ enable: true });
+            hammer.get('rotate').set({ enable: true });
+            hammer.get('press').set({ enable: true });
+            hammer.get('pan').set({ direction: Hammer.DIRECTION_ALL });
+
+            var doubleTap = new Hammer.Tap({ event: 'doubletap', taps: 2 });
+            doubleTap.recognizeWith(hammer.get('tap'));
+            hammer.add(doubleTap);
+
+            hammerEventsSub.forEach(function(eventToSub) {
+
+                hammer.on(eventToSub, function(event) {
+
+                    var view = this;
+                    var tool = view._scope.tool;
+                    var responds = tool && tool.responds(eventToSub);
+                    var point = this.getEventPoint(event.srcEvent);
+
+                    if (responds) {
+                        tool._handleTouchGestureEvent(eventToSub, event, point);
+                    }
+                });
+            });
+
             // If the element has the resize attribute, listen to resize events
             // and update its coordinate space accordingly
             if (PaperScope.hasAttribute(element, 'resize')) {
