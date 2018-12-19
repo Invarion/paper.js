@@ -361,6 +361,15 @@ var Tool = PaperScopeItem.extend(/** @lends Tool# */{
             }
         }
 
+        if (mouse.down && event && event.target && event.target.tagName && event.target.tagName.toUpperCase() === 'CANVAS') {
+
+            window.focus();
+
+            if (document.activeElement) {
+                document.activeElement.blur();
+            }
+        }
+
         if (mouse.down) {
             update();
             emit();
