@@ -559,8 +559,7 @@ var View = Base.extend(Emitter, /** @lends View# */{
     },
 
     setZoom: function(zoom) {
-        this.transform(new Matrix().scale(zoom / this.getZoom(),
-            this.getCenter()));
+        this.transform(new Matrix().scale(zoom / this.getZoom(), this._matrix.transform(this.getCenter())));
     },
 
     /**
