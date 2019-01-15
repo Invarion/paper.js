@@ -69,14 +69,16 @@ var View = Base.extend(Emitter, /** @lends View# */{
             doubleTap.recognizeWith(hammer.get('tap'));
             hammer.add(doubleTap);
 
+            var that = this;
+
             hammerEventsSub.forEach(function(eventToSub) {
 
                 hammer.on(eventToSub, function(event) {
 
-                    var view = this;
+                    var view = that;
                     var tool = view._scope.tool;
                     var responds = tool && tool.responds(eventToSub);
-                    var point = this.getEventPoint(event.srcEvent);
+                    var point = that.getEventPoint(event.srcEvent);
 
                     if (responds) {
                         tool._handleTouchGestureEvent(eventToSub, event, point);
