@@ -9,7 +9,7 @@
  *
  * All rights reserved.
  *
- * Date: Fri Feb 8 22:50:03 2019 +0100
+ * Date: Mon Feb 18 20:58:46 2019 +0100
  *
  ***
  *
@@ -11255,7 +11255,6 @@ var PointText = TextItem.extend({
 		ctx.font = style.getFontStyle();
 		ctx.textAlign = style.getJustification();
 		ctx.textBaseline = 'top';
-		ctx.translate(0, 2);
 		for (var i = 0, l = lines.length; i < l; i++) {
 			ctx.shadowColor = shadowColor;
 			var line = lines[i];
