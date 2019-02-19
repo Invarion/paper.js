@@ -21,7 +21,7 @@
  */
 var PointText = TextItem.extend(/** @lends PointText# */{
     _class: 'PointText',
-
+    _fontHeightCache: new Map(),
     /**
      * Creates a point text item
      *
@@ -85,10 +85,20 @@ var PointText = TextItem.extend(/** @lends PointText# */{
             hasFill = style.hasFill(),
             hasStroke = style.hasStroke(),
             leading = style.getLeading(),
-            shadowColor = ctx.shadowColor;
+            shadowColor = ctx.shadowColor,
+            fontCacheKey = style.font + style.fontSize;
         ctx.font = style.getFontStyle();
         ctx.textAlign = style.getJustification();
         ctx.textBaseline = 'top';
+
+        if (!this._fontHeightCache.has(fontCacheKey)) {
+            var letterWidth = ctx.measureText('M').width;
+            var topOffset = 0.12 * letterWidth;
+            this._fontHeightCache.set(fontCacheKey, topOffset)
+        }
+
+        ctx.translate(0, this._fontHeightCache.get(fontCacheKey));
+
         for (var i = 0, l = lines.length; i < l; i++) {
             // See Path._draw() for explanation about ctx.shadowColor
             ctx.shadowColor = shadowColor;
