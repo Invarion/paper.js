@@ -9,7 +9,7 @@
  *
  * All rights reserved.
  *
- * Date: Mon Feb 18 20:58:46 2019 +0100
+ * Date: Tue Feb 19 18:34:03 2019 +0100
  *
  ***
  *
@@ -11227,7 +11227,7 @@ var TextItem = Item.extend({
 
 var PointText = TextItem.extend({
 	_class: 'PointText',
-
+	_fontHeightCache: new Map(),
 	initialize: function PointText() {
 		TextItem.apply(this, arguments);
 	},
@@ -11251,10 +11251,20 @@ var PointText = TextItem.extend({
 			hasFill = style.hasFill(),
 			hasStroke = style.hasStroke(),
 			leading = style.getLeading(),
-			shadowColor = ctx.shadowColor;
+			shadowColor = ctx.shadowColor,
+			fontCacheKey = style.font + style.fontSize;
 		ctx.font = style.getFontStyle();
 		ctx.textAlign = style.getJustification();
 		ctx.textBaseline = 'top';
+
+		if (!this._fontHeightCache.has(fontCacheKey)) {
+			var letterWidth = ctx.measureText('M').width;
+			var topOffset = 0.12 * letterWidth;
+			this._fontHeightCache.set(fontCacheKey, topOffset)
+		}
+
+		ctx.translate(0, this._fontHeightCache.get(fontCacheKey));
+
 		for (var i = 0, l = lines.length; i < l; i++) {
 			ctx.shadowColor = shadowColor;
 			var line = lines[i];
