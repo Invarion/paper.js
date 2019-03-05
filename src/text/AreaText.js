@@ -59,33 +59,64 @@ var AreaText = TextItem.extend({
         this._updateAnchor();
     },
 
-    _wrap: function() {
-        this._lines = [];
+    _quickMeasureText: function (testString) {
+        return this.getView().getTextWidth(this.style.getFontStyle(), [testString]);
+    },
 
-        var paragraphs = this._content.split(/\r\n|\n|\r/mg);
-        var splittedWords = paragraphs.map(function(paragraph){
-            return paragraph.split(' ');
-        });
+    _wrapContent: function (text, maxWidth) {
 
-        for (var j = 0; j < splittedWords.length; j++) {
-
-            var words = splittedWords[j];
-            var line = '';
-
-            for (var i = 0; i < words.length; i++) {
-                var testLine = line + words[i] + ' ',
-                    testWidth = this.getView().getTextWidth(this.style.getFontStyle(), [testLine]);
-                if (testWidth > this.rectangle.width && i > 0) {
-                    this._lines.push(line.slice(0, -1));
-                    line = words[i] + ' ';
-                }
-                else {
-                    line = testLine.slice();
-                }
+        var words = text.split(' '),
+            lines = [],
+            line = '',
+            i,
+            test,
+            metricsWidth;
+    
+        for (i = 0; i < words.length; i++) {
+            test = words[i];
+            if (!test) {
+                continue
             }
 
-            this._lines.push(line);
+            metricsWidth = this._quickMeasureText(test);
+            while (metricsWidth > maxWidth) {
+                test = test.substring(0, test.length - 1);
+                metricsWidth = this._quickMeasureText(test);
+            }
+            if (!test) {
+                words.splice(i + 1, 0,  words[i].substr(1))
+                words[i] = '';
+            } else if (words[i] != test) {
+                words.splice(i + 1, 0,  words[i].substr(test.length))
+                words[i] = test;
+            }  
+    
+            test = line + words[i] + ' ';  
+            metricsWidth = this._quickMeasureText(test);
+            
+            if (metricsWidth > maxWidth && i > 0) {
+                lines.push(line);
+                line = words[i] + ' ';
+            }
+            else {
+                line = test;
+            }
         }
+                
+        lines.push(line);
+
+        return lines;
+    },        
+
+    _wrap: function () {
+        this._lines = [];
+        var paragraphs = this._content.split(/\r\n|\n|\r/mg);
+
+        paragraphs.forEach(function (paragraph) {
+
+            var splitted = this._wrapContent(paragraph, this.rectangle.width);
+            this._lines.push.apply(this._lines, splitted);
+        })
 
         if (this._lines.length) {
 
