@@ -65,6 +65,9 @@ var AreaText = TextItem.extend({
 
     _wrapContent: function (text, maxWidth) {
 
+        if (maxWidth <= 0)
+            return [];
+
         var words = text.split(' '),
             lines = [],
             line = '',
@@ -74,21 +77,21 @@ var AreaText = TextItem.extend({
     
         for (i = 0; i < words.length; i++) {
             test = words[i];
-            if (!test) {
-                continue
-            }
 
             metricsWidth = this._quickMeasureText(test);
             while (metricsWidth > maxWidth) {
                 test = test.substring(0, test.length - 1);
                 metricsWidth = this._quickMeasureText(test);
             }
-            if (!test) {
-                words.splice(i + 1, 0,  words[i].substr(1))
-                words[i] = '';
-            } else if (words[i] != test) {
-                words.splice(i + 1, 0,  words[i].substr(test.length))
-                words[i] = test;
+
+            if (words[i] != test) {
+                if (!test) {
+                    words.splice(i + 1, 0,  words[i].substr(1))
+                    words[i] = '';
+                } else {
+                    words.splice(i + 1, 0,  words[i].substr(test.length))
+                    words[i] = test;
+                }
             }  
     
             test = line + words[i] + ' ';  
@@ -106,7 +109,7 @@ var AreaText = TextItem.extend({
         lines.push(line);
 
         return lines;
-    },        
+    },
 
     _wrap: function () {
         this._lines = [];
