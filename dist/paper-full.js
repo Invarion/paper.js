@@ -9,7 +9,7 @@
  *
  * All rights reserved.
  *
- * Date: Tue Feb 19 18:34:03 2019 +0100
+ * Date: Wed Mar 6 01:13:17 2019 +0100
  *
  ***
  *
@@ -11359,33 +11359,64 @@ var AreaText = TextItem.extend({
 		this._updateAnchor();
 	},
 
-	_wrap: function() {
-		this._lines = [];
+	_quickMeasureText: function (testString) {
+		return this.getView().getTextWidth(this.style.getFontStyle(), [testString]);
+	},
 
-		var paragraphs = this._content.split(/\r\n|\n|\r/mg);
-		var splittedWords = paragraphs.map(function(paragraph){
-			return paragraph.split(' ');
-		});
+	_wrapContent: function (text, maxWidth) {
 
-		for (var j = 0; j < splittedWords.length; j++) {
+		if (maxWidth <= 0)
+			return [];
 
-			var words = splittedWords[j];
-			var line = '';
+		var words = text.split(' '),
+			lines = [],
+			line = '',
+			i,
+			test,
+			metricsWidth;
+		for (i = 0; i < words.length; i++) {
+			test = words[i];
 
-			for (var i = 0; i < words.length; i++) {
-				var testLine = line + words[i] + ' ',
-					testWidth = this.getView().getTextWidth(this.style.getFontStyle(), [testLine]);
-				if (testWidth > this.rectangle.width && i > 0) {
-					this._lines.push(line.slice(0, -1));
-					line = words[i] + ' ';
-				}
-				else {
-					line = testLine.slice();
-				}
+			metricsWidth = this._quickMeasureText(test);
+			while (metricsWidth > maxWidth) {
+				test = test.substring(0, test.length - 1);
+				metricsWidth = this._quickMeasureText(test);
 			}
 
-			this._lines.push(line);
+			if (words[i] != test) {
+				if (!test) {
+					words.splice(i + 1, 0,  words[i].substr(1))
+					words[i] = '';
+				} else {
+					words.splice(i + 1, 0,  words[i].substr(test.length))
+					words[i] = test;
+				}
+			}
+			test = line + words[i] + ' ';
+			metricsWidth = this._quickMeasureText(test);
+			if (metricsWidth > maxWidth && i > 0) {
+				lines.push(line);
+				line = words[i] + ' ';
+			}
+			else {
+				line = test;
+			}
 		}
+		lines.push(line);
+
+		return lines;
+	},
+
+	_wrap: function () {
+		this._lines = [];
+		var paragraphs = this._content.split(/\r\n|\n|\r/mg);
+		var that = this;
+
+		paragraphs.forEach(function (paragraph) {
+
+			var splitted = that._wrapContent(paragraph, that.rectangle.width);
+			that._lines.push.apply(that._lines, splitted);
+		})
 
 		if (this._lines.length) {
 
