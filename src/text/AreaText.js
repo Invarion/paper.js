@@ -114,11 +114,12 @@ var AreaText = TextItem.extend({
     _wrap: function () {
         this._lines = [];
         var paragraphs = this._content.split(/\r\n|\n|\r/mg);
+        var that = this;
 
         paragraphs.forEach(function (paragraph) {
 
-            var splitted = this._wrapContent(paragraph, this.rectangle.width);
-            this._lines.push.apply(this._lines, splitted);
+            var splitted = that._wrapContent(paragraph, that.rectangle.width);
+            that._lines.push.apply(that._lines, splitted);
         })
 
         if (this._lines.length) {
