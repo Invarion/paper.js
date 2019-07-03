@@ -9,7 +9,7 @@
  *
  * All rights reserved.
  *
- * Date: Wed Mar 6 01:24:32 2019 +0100
+ * Date: Wed Jul 3 16:09:17 2019 +0200
  *
  ***
  *
@@ -32,7 +32,6 @@
 
 var paper = function(self, undefined) {
 
-self = self || require('./node/self.js');
 var window = self.window,
 	document = self.document;
 
@@ -15314,10 +15313,6 @@ var paper = new (PaperScope.inject(Base.exports, {
 	Symbol: SymbolDefinition,
 	PlacedSymbol: SymbolItem
 }))();
-
-if (paper.agent.node) {
-	require('./node/extend.js')(paper);
-}
 
 if (typeof define === 'function' && define.amd) {
 	define('paper', paper);
